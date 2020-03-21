@@ -1,0 +1,17 @@
+body {
+	padding: 30px;
+}
+
+input, textarea {
+	display: block;
+}
+
+textarea {
+	width: 300px;
+	height: 100px;
+}
+
+col {
+	display: inline-block;
+	width: 50%;
+}

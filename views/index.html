@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Guestbook App</title>
+
+	<link rel="stylesheet" type="text/css" href="/static/css/app.css">
+</head>
+<body>
+	<h1>Guestbook App</h1>
+
+	<form>
+		<div>
+			<label for="name">Name:</label>
+			<input type="text" name="name">
+		</div>
+
+		<div>
+			<label for="message">Message: </label>
+			<textarea name="message"></textarea>
+		</div>
+
+		<input type="submit" value="Sign">
+	</form>
+
+	<p>Total Signees: {{ .SigneesCount }}</p>
+	<p><a href="#">View Messages</a></p>
+
+	<script type="text/javascript" src="/static/js/app.js"></script>
+</body>
+</html>
