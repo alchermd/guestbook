@@ -35,6 +35,10 @@
 					} else {
 						alert(`Message #${id} deleted`);
 						this.parentNode.remove();
+
+						if (document.querySelectorAll(".message").length == 0) {
+							document.body.innerHTML += "<p><em>No messages yet.</em></p>";
+						}
 					}
 				})
 			});
