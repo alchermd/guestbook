@@ -2,21 +2,21 @@ package main
 
 import (
 	"database/sql"
-	"net/http"
+	"fmt"
 	"html/template"
 	"log"
-	"fmt"
-	"time"
+	"net/http"
 	"os"
+	"time"
 
+	_ "github.com/go-sql-driver/mysql"
 	"github.com/gorilla/mux"
 	"github.com/gorilla/sessions"
-	_ "github.com/go-sql-driver/mysql"
 )
 
 type GuestbookIndexData struct {
 	SigneesCount int
-	Flashes []interface{}
+	Flashes      []interface{}
 }
 
 type GuestbookMessagesData struct {
@@ -24,10 +24,10 @@ type GuestbookMessagesData struct {
 }
 
 type Message struct {
-	Id int
-	Name string
-	Message string
-	CreatedAt time.Time	
+	Id        int
+	Name      string
+	Message   string
+	CreatedAt time.Time
 }
 
 func main() {
@@ -35,7 +35,7 @@ func main() {
 	if username == "" {
 		username = "root"
 	}
-	
+
 	password := os.Getenv("DB_PASSWORD")
 	db, err := connectToDatabase(username, password, "127.0.0.1", "3306", "guestbook")
 
@@ -54,20 +54,20 @@ func main() {
 		err := db.QueryRow("SELECT COUNT(id) AS count FROM messages").Scan(&count)
 
 		if err != nil {
-			log.Fatal(err)	
+			log.Fatal(err)
 		}
 
 		session, err := store.Get(r, "session-name")
-	    if err != nil {
-	        log.Fatal(err)
-	    }
+		if err != nil {
+			log.Fatal(err)
+		}
 
-	    flashes := session.Flashes()
-	    session.Save(r, w)
+		flashes := session.Flashes()
+		session.Save(r, w)
 
-		data := GuestbookIndexData {
+		data := GuestbookIndexData{
 			SigneesCount: count,
-			Flashes: flashes,
+			Flashes:      flashes,
 		}
 
 		tpl := template.Must(template.ParseFiles("views/index.html"))
@@ -97,14 +97,13 @@ func main() {
 			messages = append(messages, m)
 		}
 
-		data := GuestbookMessagesData {
+		data := GuestbookMessagesData{
 			Messages: messages,
 		}
 
 		tpl := template.Must(template.ParseFiles("views/messages.html"))
 		tpl.Execute(w, data)
 	}).Methods("GET")
-
 
 	router.HandleFunc("/messages", func(w http.ResponseWriter, r *http.Request) {
 		log.Print("Serving /messages [POST]")
@@ -122,16 +121,16 @@ func main() {
 		}
 
 		session, err := store.Get(r, "session-name")
-	    if err != nil {
-	        log.Fatal(err)
-	    }
+		if err != nil {
+			log.Fatal(err)
+		}
 
-	    session.AddFlash("Message successfully saved.")
-	    err = session.Save(r, w)
+		session.AddFlash("Message successfully saved.")
+		err = session.Save(r, w)
 
-	    if err != nil {
-	    	log.Fatal(err)
-	    }
+		if err != nil {
+			log.Fatal(err)
+		}
 
 		http.Redirect(w, r, "/", 301)
 	}).Methods("POST")
