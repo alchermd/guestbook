@@ -23,3 +23,9 @@ textarea {
 	color: green;
 	margin: 10px 0px;
 }
+
+.delete-button {
+	background-color: red;
+	color: white;
+	float: right;
+}

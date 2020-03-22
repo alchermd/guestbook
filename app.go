@@ -135,6 +135,14 @@ func main() {
 		http.Redirect(w, r, "/", 301)
 	}).Methods("POST")
 
+	router.HandleFunc("/messages/{id}", func(w http.ResponseWriter, r *http.Request) {
+		vars := mux.Vars(r)
+		id := vars["id"]
+		log.Printf("Serving /messages/%s [DELETE]", id)
+
+		db.Exec("DELETE FROM messages WHERE id = ?", id)
+	}).Methods("DELETE")
+
 	fs := http.FileServer(http.Dir("static/"))
 	log.Print("Serving static assets at /static")
 	router.PathPrefix("/static/").Handler(http.StripPrefix("/static/", fs))

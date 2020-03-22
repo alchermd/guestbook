@@ -10,10 +10,35 @@
 
 	{{ range .Messages }}
 		<div class="message">
-			<small>Message #{{ .Id }}</small>
+			<small>Message #{{ .Id }} </small>
 			<small>Posted by {{ .Name }}, on {{ .CreatedAt }}</small>
+			<button class="delete-button" data-id="{{ .Id }}">DELETE</button>
 			<p>{{ .Message }}</p>
 		</div>
+	{{ else }}	
+		<p><em>No messages yet.</em></p>
 	{{ end }}
+
+	<script type="text/javascript">
+		document.querySelectorAll('.message .delete-button').forEach(el => {
+			el.addEventListener('click', function() {
+				const id = this.dataset.id;
+				fetch(`/messages/${id}`, {
+					method: 'DELETE',
+					headers: {
+						'Content-Type': 'application/json'
+					},
+				})
+				.then(data => {
+					if (data.status != 200) {
+						alert('Something went wrong');
+					} else {
+						alert(`Message #${id} deleted`);
+						this.parentNode.remove();
+					}
+				})
+			});
+		});
+	</script>
 </body>
 </html>
