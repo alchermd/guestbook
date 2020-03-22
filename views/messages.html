@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Guestbook App | Messages</title>
+
+	<link rel="stylesheet" type="text/css" href="/static/css/app.css">
+</head>
+<body>
+	<h1><a href="/">Guestbook App</a></h1>
+
+	{{ range .Messages }}
+		<div class="message">
+			<small>Message #{{ .Id }}</small>
+			<small>Posted by {{ .Name }}, on {{ .CreatedAt }}</small>
+			<p>{{ .Message }}</p>
+		</div>
+	{{ end }}
+</body>
+</html>

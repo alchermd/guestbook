@@ -6,6 +6,7 @@ import (
 	"html/template"
 	"log"
 	"fmt"
+	"time"
 	"os"
 
 	"github.com/gorilla/mux"
@@ -16,8 +17,18 @@ type GuestbookIndexData struct {
 	SigneesCount int
 }
 
+type GuestbookMessagesData struct {
+	Messages []Message
+}
+
+type Message struct {
+	Id int
+	Name string
+	Message string
+	CreatedAt time.Time	
+}
+
 func main() {
-	router := mux.NewRouter()
 	username := os.Getenv("DB_USER")
 	if username == "" {
 		username = "root"
@@ -29,6 +40,8 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
+
+	router := mux.NewRouter()
 
 	router.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
 		log.Print("Serving /")
@@ -46,7 +59,38 @@ func main() {
 
 		tpl := template.Must(template.ParseFiles("views/index.html"))
 		tpl.Execute(w, data)
-	})
+	}).Methods("GET")
+
+	router.HandleFunc("/messages", func(w http.ResponseWriter, r *http.Request) {
+		log.Print("Serving /messages")
+
+		rows, err := db.Query("SELECT id, name, message, created_at FROM messages")
+
+		if err != nil {
+			log.Fatal(err)
+		}
+
+		defer rows.Close()
+
+		var messages []Message
+		for rows.Next() {
+			var m Message
+			err := rows.Scan(&m.Id, &m.Name, &m.Message, &m.CreatedAt)
+
+			if err != nil {
+				log.Fatal(err)
+			}
+
+			messages = append(messages, m)
+		}
+
+		data := GuestbookMessagesData {
+			Messages: messages,
+		}
+
+		tpl := template.Must(template.ParseFiles("views/messages.html"))
+		tpl.Execute(w, data)
+	}).Methods("GET")
 
 	fs := http.FileServer(http.Dir("static/"))
 	log.Print("Serving static assets at /static")
