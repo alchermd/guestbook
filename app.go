@@ -92,6 +92,25 @@ func main() {
 		tpl.Execute(w, data)
 	}).Methods("GET")
 
+
+	router.HandleFunc("/messages", func(w http.ResponseWriter, r *http.Request) {
+		log.Print("Serving /messages [POST]")
+
+		name := r.FormValue("name")
+
+		if name == "" {
+			name = "Anonymous"
+		}
+
+		_, err := db.Exec("INSERT INTO messages(name, message) VALUES(?, ?)", name, r.FormValue("message"))
+
+		if err != nil {
+			log.Fatal(err)
+		}
+
+		http.Redirect(w, r, "/", 301)
+	}).Methods("POST")
+
 	fs := http.FileServer(http.Dir("static/"))
 	log.Print("Serving static assets at /static")
 	router.PathPrefix("/static/").Handler(http.StripPrefix("/static/", fs))
