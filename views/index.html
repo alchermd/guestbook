@@ -8,6 +8,10 @@
 <body>
 	<h1><a href="/">Guestbook App</a></h1>
 
+	{{ range $message := .Flashes }}
+		<small class="flash">{{ $message }}</small>
+	{{ end }}
+
 	<form action="/messages" method="POST">
 		<div>
 			<label for="name">Name:</label>
@@ -24,7 +28,5 @@
 
 	<p>Total Signees: {{ .SigneesCount }}</p>
 	<p><a href="/messages">View Messages</a></p>
-
-	<script type="text/javascript" src="/static/js/app.js"></script>
 </body>
 </html>

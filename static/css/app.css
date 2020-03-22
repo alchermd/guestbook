@@ -18,3 +18,8 @@ textarea {
 	background-color: gray;
 	color: white;
 }
+
+.flash {
+	color: green;
+	margin: 10px 0px;
+}

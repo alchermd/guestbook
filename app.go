@@ -10,11 +10,13 @@ import (
 	"os"
 
 	"github.com/gorilla/mux"
+	"github.com/gorilla/sessions"
 	_ "github.com/go-sql-driver/mysql"
 )
 
 type GuestbookIndexData struct {
 	SigneesCount int
+	Flashes []interface{}
 }
 
 type GuestbookMessagesData struct {
@@ -41,6 +43,8 @@ func main() {
 		log.Fatal(err)
 	}
 
+	store := sessions.NewCookieStore([]byte(os.Getenv("SESSION_KEY")))
+
 	router := mux.NewRouter()
 
 	router.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
@@ -53,8 +57,17 @@ func main() {
 			log.Fatal(err)	
 		}
 
+		session, err := store.Get(r, "session-name")
+	    if err != nil {
+	        log.Fatal(err)
+	    }
+
+	    flashes := session.Flashes()
+	    session.Save(r, w)
+
 		data := GuestbookIndexData {
 			SigneesCount: count,
+			Flashes: flashes,
 		}
 
 		tpl := template.Must(template.ParseFiles("views/index.html"))
@@ -107,6 +120,18 @@ func main() {
 		if err != nil {
 			log.Fatal(err)
 		}
+
+		session, err := store.Get(r, "session-name")
+	    if err != nil {
+	        log.Fatal(err)
+	    }
+
+	    session.AddFlash("Message successfully saved.")
+	    err = session.Save(r, w)
+
+	    if err != nil {
+	    	log.Fatal(err)
+	    }
 
 		http.Redirect(w, r, "/", 301)
 	}).Methods("POST")
